@@ -1,0 +1,70 @@
+version: 2
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+
+builds:
+  - id: my-server
+    dir: cmd/server
+    binary: my-server
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+release:
+  header: >-
+    # 🚀 Release {{ .Version }}
+
+sboms:
+  - artifacts: archive
+
+kos:
+  - id: my-server
+    build: my-server
+    base_image: gcr.io/distroless/static:nonroot
+    user: 65532:65532
+    repositories:
+      - ghcr.io/<your_username>/<your_project_name> # TODO: replace with your repo
+    labels:
+      org.opencontainers.image.source: https://github.com/<your_username>/<your_project_name> # TODO: replace with your repo
+      org.opencontainers.image.version: "{{.Version}}"
+      org.opencontainers.image.description: |
+        This is a test description
+    tags:
+      - latest
+      - "{{.Tag}}"
+      - "{{if not .Prerelease}}stable{{end}}"
+    bare: true
+    platforms:
+      - linux/amd64
+      - linux/arm64
+      - windows/amd64

@@ -1,0 +1,33 @@
+name: Go Test
+
+on:
+  push:
+
+jobs:
+  test:
+    name: Run unit tests
+    strategy:
+      fail-fast: false # run all tests even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+      - name: Run tests
+        run: make test

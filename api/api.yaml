@@ -1,0 +1,268 @@
+openapi: 3.0.4
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: >-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification. 
+    You can find out more about
+
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration
+    of the pet store, we've switched to the design first approach!
+
+    You can now help us improve the API whether it's by making changes to the
+    definition itself or to the code.
+
+    That way, with time, we can improve the API in general, and expose some of
+    the new features in OAS3.
+
+
+    Some useful links:
+
+    - [The Pet Store
+    repository](https://github.com/swagger-api/swagger-petstore)
+
+    - [The source API definition for the Pet
+    Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: https://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.26
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+servers:
+  - url: /api/v3
+tags:
+  - name: pet
+    description: Everything about your Pets
+    externalDocs:
+      description: Find out more
+      url: https://swagger.io
+paths:
+  /pets:
+    post:
+      tags:
+        - pet
+      summary: Add a new pet to the store.
+      description: Add a new pet to the store.
+      operationId: addPet
+      requestBody:
+        description: Create a new pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ErrorResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    get:
+      tags:
+        - pet
+      summary: List multiple pets
+      description: Get multiple pets from the store
+      operationId: listPets
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pet"
+                required:
+                  - items
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ErrorResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+  /pets/{petId}:
+    put:
+      tags:
+        - pet
+      summary: Update an existing pet.
+      description: Update an existing pet by Id.
+      operationId: updatePet
+      parameters:
+        - $ref: "#/components/parameters/PetId"
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pet"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ErrorResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    get:
+      tags:
+        - pet
+      summary: Find pet by ID.
+      description: Returns a single pet.
+      operationId: getPetById
+      parameters:
+        - $ref: "#/components/parameters/PetId"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "404":
+          $ref: "#/components/responses/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ErrorResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+    delete:
+      tags:
+        - pet
+      summary: Deletes a pet.
+      description: Delete a pet.
+      operationId: deletePet
+      parameters:
+        - $ref: "#/components/parameters/PetId"
+      responses:
+        "204":
+          description: Pet deleted
+        "400":
+          $ref: "#/components/responses/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/ErrorResponse"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+components:
+  parameters:
+    PetId:
+      name: petId
+      in: path
+      description: the unique ID of the pet
+      required: true
+      schema:
+        type: string
+  responses:
+    ErrorResponse:
+      description: In case of any error, this object is returned
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ApiProblem"
+  schemas:
+    ApiProblem:
+      description: Based on https://www.rfc-editor.org/rfc/rfc9457.html
+      type: object
+      required:
+        - type
+        - status
+        - title
+        - detail
+      properties:
+        type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+    Category:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Dogs
+    Tag:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    Pet:
+      required:
+        - name
+        - category
+        - tags
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: doggie
+        category:
+          $ref: "#/components/schemas/Category"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+        status:
+          type: string
+          description: pet status in the store
+          enum:
+            - available
+            - pending
+            - sold
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
