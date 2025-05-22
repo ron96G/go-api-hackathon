@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/getkin/kin-openapi v0.127.0
-	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/fiber/v2 v2.52.7
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 )
